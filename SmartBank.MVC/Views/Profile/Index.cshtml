@@ -1,0 +1,77 @@
+@model SmartBank.MVC.ViewModels.ProfileViewModel
+@{ ViewData["Title"] = "My Profile"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<h4 class="fw-bold mb-4"><i class="bi bi-person-circle me-2"></i>My Profile</h4>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card p-4 text-center">
+            <div class="rounded-circle bg-primary d-inline-flex align-items-center
+                        justify-content-center mx-auto mb-3"
+                 style="width:80px;height:80px">
+                <i class="bi bi-person-fill text-white" style="font-size:2.5rem"></i>
+            </div>
+            <h5 class="fw-bold mb-0">@Model.FullName</h5>
+            <p class="text-muted small">@Model.Email</p>
+            <span class="badge bg-primary">@Model.Role</span>
+
+            <hr />
+
+            @{
+                var kycClass = Model.KycStatus switch
+                {
+                    "Verified" => "bg-success",
+                    "Rejected" => "bg-danger",
+                    _ => "bg-warning text-dark"
+                };
+            }
+            <div>
+                <small class="text-muted d-block mb-1">KYC Status</small>
+                <span class="badge @kycClass fs-6">
+                    <i class="bi bi-shield-check me-1"></i>@Model.KycStatus
+                </span>
+            </div>
+
+            <div class="mt-3">
+                <small class="text-muted d-block">Member since</small>
+                <small class="fw-semibold">@Model.CreatedAt.ToString("MMMM dd, yyyy")</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h6 class="fw-bold mb-3">Account Details</h6>
+            <table class="table table-borderless">
+                <tbody>
+                    <tr>
+                        <td class="text-muted" style="width:35%">User ID</td>
+                        <td class="fw-semibold">#@Model.UserId</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Full Name</td>
+                        <td class="fw-semibold">@Model.FullName</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Email</td>
+                        <td class="fw-semibold">@Model.Email</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Phone</td>
+                        <td class="fw-semibold">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "—" : Model.PhoneNumber)</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Address</td>
+                        <td class="fw-semibold">@(string.IsNullOrEmpty(Model.Address) ? "—" : Model.Address)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="mt-2">
+                <button class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-pencil me-1"></i> Edit Profile
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

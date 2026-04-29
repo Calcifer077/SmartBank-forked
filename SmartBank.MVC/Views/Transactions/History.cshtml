@@ -1,0 +1,121 @@
+@model SmartBank.MVC.ViewModels.TransactionHistoryViewModel
+@{ ViewData["Title"] = "Transaction History"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+@{
+    var cardColor = Model.AccountType == "Savings" ? "primary" : "info";
+}
+
+<!-- Page Header -->
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1><i class="bi bi-clock-history me-2"></i>Transaction History</h1>
+        <p class="font-monospace mb-0"><i class="bi bi-hash me-1"></i>@Model.AccountNumber — @Model.AccountType Account</p>
+    </div>
+    <a asp-controller="Accounts" asp-action="Detail" asp-route-id="@Model.AccountId"
+       class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Back to Account
+    </a>
+</div>
+
+<!-- Balance Card + Quick Actions -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-md border-0">
+            <div class="card-body text-center" style="background: linear-gradient(135deg, #005EB8, #1B5BAA); color: white; border-radius: 12px;">
+                <small class="opacity-75 d-block mb-1">Current Balance</small>
+                <h2 class="fw-bold mb-0">₹@Model.CurrentBalance.ToString("N2")</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <small class="text-muted d-block mb-2"><i class="bi bi-lightning-fill me-1"></i><strong>Quick Actions</strong></small>
+                <div class="d-flex flex-wrap gap-2">
+                    <a asp-controller="Transactions" asp-action="Deposit"
+                       asp-route-accountId="@Model.AccountId"
+                       class="btn btn-success btn-sm">
+                        <i class="bi bi-plus-circle me-1"></i> Deposit
+                    </a>
+                    <a asp-controller="Transactions" asp-action="Withdraw"
+                       asp-route-accountId="@Model.AccountId"
+                       class="btn btn-danger btn-sm">
+                        <i class="bi bi-dash-circle me-1"></i> Withdraw
+                    </a>
+                    <a asp-controller="Transactions" asp-action="Transfer"
+                       asp-route-accountId="@Model.AccountId"
+                       class="btn btn-primary btn-sm">
+                        <i class="bi bi-arrow-left-right me-1"></i> Transfer
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transactions Table -->
+<div class="card shadow-md border-0">
+    <div class="card-header">
+        <i class="bi bi-list-check me-2"></i>Recent Transactions
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.Transactions.Any())
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox" style="font-size: 3rem; color: #005EB8; margin-bottom: 1rem; display: block;"></i>
+                <h5 class="fw-bold mb-1">No transactions yet</h5>
+                <p class="mb-0">Make a deposit to get started with your account.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4"><i class="bi bi-calendar me-2"></i>Date & Time</th>
+                            <th><i class="bi bi-tag me-2"></i>Type</th>
+                            <th><i class="bi bi-file-text me-2"></i>Description</th>
+                            <th class="text-end"><i class="bi bi-cash-coin me-2"></i>Amount</th>
+                            <th class="text-end pe-4"><i class="bi bi-graph-up me-2"></i>Balance After</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tx in Model.Transactions)
+                        {
+                            var amtColor = tx.IsCredit ? "text-success" : "text-danger";
+                            var amtPrefix = tx.IsCredit ? "+" : "-";
+                            var typeIcon = tx.IsCredit ? "arrow-down-circle" : "arrow-up-circle";
+                            var typeBadge = tx.IsCredit ? "success" : "danger";
+
+                            <tr class="transition-smooth">
+                                <td class="ps-4">
+                                    <span class="fw-semibold small d-block">
+                                        @tx.CreatedAt.ToString("dd MMM yyyy")
+                                    </span>
+                                    <small class="text-muted">
+                                        @tx.CreatedAt.ToString("hh:mm tt")
+                                    </small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-@typeBadge bg-opacity-10 text-@typeBadge border border-@typeBadge">
+                                        <i class="bi bi-@typeIcon me-1"></i>@tx.Type
+                                    </span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">@tx.Description</small>
+                                </td>
+                                <td class="text-end fw-bold @amtColor">
+                                    <small>@amtPrefix ₹</small>@tx.Amount.ToString("N2")
+                                </td>
+                                <td class="text-end pe-4 text-muted">
+                                    <small>₹@tx.BalanceAfter.ToString("N2")</small>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

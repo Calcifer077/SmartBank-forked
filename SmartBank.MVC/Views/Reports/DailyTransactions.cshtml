@@ -1,0 +1,101 @@
+@model SmartBank.MVC.ViewModels.DailyTransactionReportViewModel
+@{ ViewData["Title"] = "Daily Transactions"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">
+        <i class="bi bi-calendar-check me-2"></i>Daily Transactions
+    </h4>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Reports
+    </a>
+</div>
+
+<!-- Date Picker -->
+<div class="card p-3 mb-4">
+    <form method="get" class="d-flex align-items-center gap-3">
+        <label class="fw-semibold small mb-0">Select Date:</label>
+        <input type="date" name="date" class="form-control form-control-sm"
+               style="width:200px"
+               value="@Model.ReportDate.ToString("yyyy-MM-dd")" />
+        <button class="btn btn-primary btn-sm">
+            <i class="bi bi-search me-1"></i> Load
+        </button>
+    </form>
+</div>
+
+<!-- Summary -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card p-3 text-center bg-primary bg-opacity-10">
+            <small class="text-muted">Total Transactions</small>
+            <h4 class="fw-bold text-primary mb-0">@Model.Transactions.Count</h4>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 text-center bg-success bg-opacity-10">
+            <small class="text-muted">Total Deposits</small>
+            <h4 class="fw-bold text-success mb-0">
+                ₹@Model.TotalDeposits.ToString("N2")
+            </h4>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 text-center bg-danger bg-opacity-10">
+            <small class="text-muted">Total Withdrawals</small>
+            <h4 class="fw-bold text-danger mb-0">
+                ₹@Model.TotalWithdrawals.ToString("N2")
+            </h4>
+        </div>
+    </div>
+</div>
+
+<!-- Transactions Table -->
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4">#</th>
+                    <th>Account</th>
+                    <th>Customer</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Balance After</th>
+                    <th>Description</th>
+                    <th class="pe-4">Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Transactions.Any())
+                {
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            No transactions for @Model.ReportDate.ToString("dd MMM yyyy")
+                        </td>
+                    </tr>
+                }
+                @foreach (var txn in Model.Transactions)
+                {
+                    var typeClass = txn.IsCredit ? "success" : "danger";
+                    var icon = txn.IsCredit ? "arrow-down" : "arrow-up";
+                    <tr>
+                        <td class="ps-4 text-muted small">#@txn.TransactionId</td>
+                        <td class="font-monospace small">@txn.AccountNumber</td>
+                        <td>@txn.CustomerName</td>
+                        <td>
+                            <span class="badge bg-@typeClass">
+                                <i class="bi bi-@icon me-1"></i>@txn.Type
+                            </span>
+                        </td>
+                        <td class="fw-semibold">₹@txn.Amount.ToString("N2")</td>
+                        <td class="text-muted">₹@txn.BalanceAfter.ToString("N2")</td>
+                        <td class="text-muted small">@txn.Description</td>
+                        <td class="pe-4 text-muted small">
+                            @txn.CreatedAt.ToString("HH:mm:ss")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

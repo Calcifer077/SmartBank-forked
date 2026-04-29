@@ -1,0 +1,117 @@
+@model SmartBank.MVC.ViewModels.AccountDetailViewModel
+@{ ViewData["Title"] = "Account Detail"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+@{
+    var cardColor = Model.AccountType == "Savings" ? "primary" : "success";
+    var icon = Model.AccountType == "Savings" ? "piggy-bank" : "briefcase";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">
+        <i class="bi bi-@icon me-2"></i>Account Details
+    </h4>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to Accounts
+    </a>
+</div>
+
+<div class="row g-4">
+
+    <!-- Balance Card -->
+    <div class="col-md-4">
+        <div class="card p-4 bg-@cardColor text-white text-center">
+            <small class="opacity-75 mb-1">Available Balance</small>
+            <h2 class="fw-bold mb-0">₹@Model.Balance.ToString("N2")</h2>
+            <hr class="border-white opacity-25" />
+            <span class="badge bg-white text-@cardColor fs-6">@Model.AccountType</span>
+        </div>
+
+        <div class="card p-3 mt-3">
+            @{
+                var statusClass = Model.Status == "Active" ? "success" :
+                                  Model.Status == "Frozen" ? "warning" : "danger";
+            }
+            <div class="d-flex justify-content-between py-1">
+                <small class="text-muted">Status</small>
+                <span class="badge bg-@statusClass">@Model.Status</span>
+            </div>
+            <div class="d-flex justify-content-between py-1">
+                <small class="text-muted">Opened On</small>
+                <small class="fw-semibold">@Model.OpenedAt.ToString("dd MMM yyyy")</small>
+            </div>
+            <div class="d-flex justify-content-between py-1">
+                <small class="text-muted">Account ID</small>
+                <small class="fw-semibold">#@Model.AccountId</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Info -->
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h6 class="fw-bold mb-3">Account Information</h6>
+            <table class="table table-borderless mb-0">
+                <tbody>
+                    <tr>
+                        <td class="text-muted" style="width:40%">Account Number</td>
+                        <td>
+                            <span class="fw-semibold font-monospace">
+                                @Model.AccountNumber
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Account Type</td>
+                        <td class="fw-semibold">@Model.AccountType</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Account Holder</td>
+                        <td class="fw-semibold">@Model.OwnerName</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Email</td>
+                        <td class="fw-semibold">@Model.OwnerEmail</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Transactions placeholder -->
+        <div class="card p-4 mt-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0">Recent Transactions</h6>
+            </div>
+            <div class="text-center py-4">
+    <i class="bi bi-clock-history text-muted" style="font-size:2rem"></i>
+    <p class="small mt-2 mb-3 text-muted">View full transaction history</p>
+    <a asp-controller="Transactions" asp-action="History"
+       asp-route-accountId="@Model.AccountId"
+       class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-list-ul me-1"></i> View All Transactions
+    </a>
+</div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card p-4 mt-3">
+            <h6 class="fw-bold mb-3">Actions</h6>
+            <div class="d-flex flex-wrap gap-2">
+    <a asp-controller="Transactions" asp-action="Deposit"
+       asp-route-accountId="@Model.AccountId"
+       class="btn btn-outline-success btn-sm">
+        <i class="bi bi-plus-circle me-1"></i> Deposit
+    </a>
+    <a asp-controller="Transactions" asp-action="Withdraw"
+       asp-route-accountId="@Model.AccountId"
+       class="btn btn-outline-danger btn-sm">
+        <i class="bi bi-dash-circle me-1"></i> Withdraw
+    </a>
+    <a asp-controller="Transactions" asp-action="Transfer"
+       asp-route-accountId="@Model.AccountId"
+       class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-send me-1"></i> Transfer
+    </a>
+</div>
+        </div>
+    </div>
+</div>

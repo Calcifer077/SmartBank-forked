@@ -1,0 +1,121 @@
+@model SmartBank.MVC.ViewModels.AdminDashboardViewModel
+@{ ViewData["Title"] = "Admin Dashboard"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">
+        <i class="bi bi-shield-check me-2"></i>Admin Dashboard
+    </h4>
+    <div>
+        <a asp-action="Users" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-people me-1"></i> Users
+        </a>
+        <a asp-action="Loans" class="btn btn-sm btn-outline-primary ms-2">
+            <i class="bi bi-cash-stack me-1"></i> Loans
+        </a>
+        <a asp-action="Tickets" class="btn btn-sm btn-outline-primary ms-2">
+            <i class="bi bi-headset me-1"></i> Tickets
+        </a>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card p-3 bg-primary bg-opacity-10 border-primary">
+            <small class="text-muted d-block">Total Users</small>
+            <h3 class="fw-bold text-primary mb-0">@Model.TotalUsers</h3>
+            <small class="text-success">@Model.ActiveUsers active</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 bg-info bg-opacity-10 border-info">
+            <small class="text-muted d-block">Total Accounts</small>
+            <h3 class="fw-bold text-info mb-0">@Model.TotalAccounts</h3>
+            <small class="text-danger">@Model.FrozenAccounts frozen</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 bg-warning bg-opacity-10 border-warning">
+            <small class="text-muted d-block">Pending Loans</small>
+            <h3 class="fw-bold text-warning mb-0">@Model.PendingLoans</h3>
+            <small class="text-muted">Awaiting review</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 bg-danger bg-opacity-10 border-danger">
+            <small class="text-muted d-block">Open Tickets</small>
+            <h3 class="fw-bold text-danger mb-0">@Model.OpenTickets</h3>
+            <small class="text-muted">Requires support</small>
+        </div>
+    </div>
+</div>
+
+<!-- Today's Activity -->
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-gradient">
+                <h6 class="card-title mb-0">Today's Transactions</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-6 border-end">
+                        <div class="mb-2">
+                            <small class="text-muted d-block">Total Deposits</small>
+                            <h5 class="text-success mb-0">₹@Model.TotalDepositsToday.ToString("N2")</h5>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-2">
+                            <small class="text-muted d-block">Total Withdrawals</small>
+                            <h5 class="text-danger mb-0">₹@Model.TotalWithdrawalsToday.ToString("N2")</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3 pt-3 border-top text-center">
+                    <small class="text-muted">Total Transactions: <strong>@Model.TransactionsToday</strong></small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-gradient">
+                <h6 class="card-title mb-0">Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <a href="@Url.Action("Users")" class="list-group-item list-group-item-action">
+                        <i class="bi bi-people me-2"></i>
+                        <span>Manage Users</span>
+                        <span class="float-end">
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </span>
+                    </a>
+                    <a href="@Url.Action("Loans")" class="list-group-item list-group-item-action">
+                        <i class="bi bi-cash-stack me-2"></i>
+                        <span>Review Loan Applications</span>
+                        <span class="float-end">
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </span>
+                    </a>
+                    <a href="@Url.Action("Tickets")" class="list-group-item list-group-item-action">
+                        <i class="bi bi-headset me-2"></i>
+                        <span>Resolve Support Tickets</span>
+                        <span class="float-end">
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </span>
+                    </a>
+                    <a href="@Url.Action("Index", "Reports")" class="list-group-item list-group-item-action">
+                        <i class="bi bi-bar-chart me-2"></i>
+                        <span>View Reports</span>
+                        <span class="float-end">
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

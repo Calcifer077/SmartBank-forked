@@ -1,0 +1,104 @@
+@model SmartBank.MVC.ViewModels.TransferViewModel
+@{ ViewData["Title"] = "Transfer"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row justify-content-center mt-2">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <div class="text-center mb-4">
+                <i class="bi bi-send text-primary" style="font-size:2.5rem"></i>
+                <h4 class="mt-2 fw-bold">Transfer Funds</h4>
+                <p class="text-muted small">Send money to any SmartBank account</p>
+            </div>
+
+            <form asp-action="Transfer" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger py-2 small"></div>
+
+                <!-- From Account -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">From Account</label>
+                    <select asp-for="FromAccountId" class="form-select"
+                            id="fromAccountSelect">
+                        @foreach (var acc in Model.UserAccounts)
+                        {
+                            <option value="@acc.AccountId"
+                                    data-balance="@acc.Balance"
+                                    data-number="@acc.AccountNumber"
+                                    selected="@(acc.AccountId == Model.FromAccountId)">
+                                @acc.AccountNumber — @acc.AccountType
+                                (₹@acc.Balance.ToString("N2"))
+                            </option>
+                        }
+                    </select>
+                    <small class="text-muted">
+                        Balance:
+                        <span id="balanceDisplay" class="fw-semibold text-success">
+                            ₹@Model.CurrentBalance.ToString("N2")
+                        </span>
+                    </small>
+                </div>
+
+                <!-- To Account -->
+                <div class="mb-3">
+                    <label asp-for="ToAccountNumberString" class="form-label fw-semibold">
+                        To Account Number
+                    </label>
+                    <input asp-for="ToAccountNumberString" class="form-control font-monospace"
+                           placeholder="SB-20241234567890" />
+                    <span asp-validation-for="ToAccountNumberString"
+                          class="text-danger small"></span>
+                    <small class="text-muted">Enter the full SmartBank account number</small>
+                </div>
+
+                <!-- Amount -->
+                <div class="mb-3">
+                    <label asp-for="Amount" class="form-label fw-semibold">Amount (₹)</label>
+                    <div class="input-group">
+                        <span class="input-group-text">₹</span>
+                        <input asp-for="Amount" type="number" step="0.01" min="1"
+                               class="form-control form-control-lg" placeholder="0.00" />
+                    </div>
+                    <span asp-validation-for="Amount" class="text-danger small"></span>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-4">
+                    <label asp-for="Description" class="form-label fw-semibold">
+                        Description
+                    </label>
+                    <input asp-for="Description" class="form-control"
+                           placeholder="e.g. Rent, payment..." />
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+
+                <div class="alert alert-light border small py-2">
+                    <i class="bi bi-shield-check me-1 text-success"></i>
+                    Transfers are instant and secured. Destination account must be active.
+                </div>
+
+                <div class="d-flex gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary flex-grow-1">
+                        <i class="bi bi-send me-1"></i> Send Money
+                    </button>
+                    <a asp-controller="Accounts" asp-action="Index"
+                       class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const select = document.getElementById('fromAccountSelect');
+        const display = document.getElementById('balanceDisplay');
+
+        select.addEventListener('change', () => {
+            const selected = select.options[select.selectedIndex];
+            const balance = parseFloat(selected.dataset.balance || 0);
+            display.textContent = '₹' + balance.toLocaleString('en-IN',
+                { minimumFractionDigits: 2 });
+        });
+    </script>
+}

@@ -1,0 +1,94 @@
+@model SmartBank.MVC.ViewModels.AdminUserListViewModel
+@{ ViewData["Title"] = "Manage Users"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">
+        <i class="bi bi-people me-2"></i>Manage Users
+        <span class="badge bg-primary ms-2">@Model.Users.Count</span>
+    </h4>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Dashboard
+    </a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4">#</th>
+                    <th>User Info</th>
+                    <th>Contact</th>
+                    <th>Role</th>
+                    <th>KYC Status</th>
+                    <th>Accounts</th>
+                    <th class="text-center">Status</th>
+                    <th class="pe-4 text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Users.Any())
+                {
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            No users found
+                        </td>
+                    </tr>
+                }
+                @foreach (var user in Model.Users)
+                {
+                    var kycBadgeClass = user.KycStatus == "Verified" ? "success" :
+                                        user.KycStatus == "Rejected" ? "danger" : "warning";
+                    var statusBadgeClass = user.IsActive ? "success" : "danger";
+                    <tr>
+                        <td class="ps-4 text-muted small">#@user.UserId</td>
+                        <td>
+                            <div class="fw-semibold">@user.FullName</div>
+                            <div class="text-muted small">@user.Email</div>
+                        </td>
+                        <td class="text-muted small">@user.PhoneNumber</td>
+                        <td>
+                            <span class="badge bg-info">@user.Role</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-@kycBadgeClass">@user.KycStatus</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-light text-dark">@user.AccountCount</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-@statusBadgeClass">
+                                @(user.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td class="pe-4 text-center">
+                            @if (user.IsActive)
+                            {
+                                <form asp-action="FreezeAccount" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="accountId" value="@user.UserId" />
+                                    <input type="hidden" name="action" value="Freeze" />
+                                    <button type="submit" class="btn btn-sm btn-outline-warning" 
+                                            onclick="return confirm('Freeze this account?');">
+                                        <i class="bi bi-lock"></i>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="FreezeAccount" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="accountId" value="@user.UserId" />
+                                    <input type="hidden" name="action" value="Unfreeze" />
+                                    <button type="submit" class="btn btn-sm btn-outline-success">
+                                        <i class="bi bi-unlock"></i>
+                                    </button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,195 @@
+@model SmartBank.MVC.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (Model == null)
+{
+    <div class="alert alert-danger"><i class="bi bi-exclamation-circle me-2"></i>Dashboard data not available.</div>
+    return;
+}
+
+<!-- Hero Section -->
+<div class="dashboard-hero slide-up-animation">
+    <div class="hero-content">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1 class="hero-greeting">Welcome back, @Model.FullName! 👋</h1>
+                <p class="hero-subtext"><i class="bi bi-envelope me-2"></i>@Model.Email</p>
+            </div>
+            <span class="welcome-badge">@Model.Role</span>
+        </div>
+    </div>
+</div>
+
+<!-- KYC Warning Banner -->
+@if (!string.IsNullOrEmpty(Model.KycStatus) && Model.KycStatus == "Pending")
+{
+    <div class="kyc-banner fade-in-animation">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div class="kyc-content">
+            <h6><i class="bi bi-shield-exclamation me-2"></i>KYC Verification Pending</h6>
+            <p>Please complete your identity verification to unlock all features and transaction limits.</p>
+        </div>
+    </div>
+}
+
+<!-- Carousel/Slideshow Section -->
+<div class="carousel-container slide-up-animation">
+    <div id="dashboardCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#dashboardCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#dashboardCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#dashboardCarousel" data-bs-slide-to="2"></button>
+        </div>
+
+        <div class="carousel-inner">
+            <div class="carousel-item active slide-1">
+                <div class="carousel-content">
+                    <h3><i class="bi bi-shield-lock me-2"></i>Secure Banking</h3>
+                    <p>Your accounts are protected with 256-bit encryption and advanced security features</p>
+                </div>
+            </div>
+
+            <div class="carousel-item slide-2">
+                <div class="carousel-content">
+                    <h3><i class="bi bi-lightning-charge me-2"></i>Fast Transfers</h3>
+                    <p>Send money instantly to any account with our real-time transfer system</p>
+                </div>
+            </div>
+
+            <div class="carousel-item slide-3">
+                <div class="carousel-content">
+                    <h3><i class="bi bi-percent me-2"></i>Competitive Rates</h3>
+                    <p>Get the best rates on savings accounts, loans, and investment products</p>
+                </div>
+            </div>
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#dashboardCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#dashboardCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+</div>
+
+<!-- Quick Stats Grid -->
+<div class="quick-stats slide-up-animation">
+    <a asp-controller="Accounts" asp-action="Index" class="text-decoration-none">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="bi bi-wallet2"></i>
+            </div>
+            <div class="stat-label">My Accounts</div>
+            <div class="stat-value">—</div>
+            <div class="stat-description">Manage all your bank accounts</div>
+        </div>
+    </a>
+
+    <a asp-controller="Transactions" asp-action="History" asp-route-accountId="0" class="text-decoration-none">
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="bi bi-arrow-left-right"></i>
+            </div>
+            <div class="stat-label">Recent Activity</div>
+            <div class="stat-value">—</div>
+            <div class="stat-description">View your transaction history</div>
+        </div>
+    </a>
+
+    <a asp-controller="Loans" asp-action="Index" class="text-decoration-none">
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="stat-label">Active Loans</div>
+            <div class="stat-value">—</div>
+            <div class="stat-description">Monitor your loan accounts</div>
+        </div>
+    </a>
+
+    <a asp-controller="Support" asp-action="Index" class="text-decoration-none">
+        <div class="stat-card">
+            <div class="stat-icon danger">
+                <i class="bi bi-headset"></i>
+            </div>
+            <div class="stat-label">Support Tickets</div>
+            <div class="stat-value">—</div>
+            <div class="stat-description">Get assistance when you need it</div>
+        </div>
+    </a>
+</div>
+
+<!-- Quick Actions Section -->
+<div class="quick-actions-section slide-up-animation">
+    <h6><i class="bi bi-lightning-fill me-2"></i>Quick Actions</h6>
+    <div class="action-buttons">
+        <a asp-controller="Profile" asp-action="Index" class="btn-action primary">
+            <i class="bi bi-person-check"></i> View Profile
+        </a>
+
+        <a asp-controller="Accounts" asp-action="Index" class="btn-action primary">
+            <i class="bi bi-plus-circle"></i> My Accounts
+        </a>
+
+        <a asp-controller="Transactions" asp-action="Transfer" asp-route-accountId="0" class="btn-action">
+            <i class="bi bi-arrow-left-right"></i> Transfer Money
+        </a>
+
+        <a asp-controller="Loans" asp-action="Index" class="btn-action">
+            <i class="bi bi-cash-coin"></i> Apply for Loan
+        </a>
+
+        <a asp-controller="Support" asp-action="Index" class="btn-action">
+            <i class="bi bi-chat-dots"></i> Contact Support
+        </a>
+    </div>
+</div>
+
+<!-- Bank Features Section -->
+<div class="cards-grid slide-up-animation">
+    <div class="card card-success">
+        <div class="card-body text-center">
+            <i class="bi bi-shield-check" style="font-size: 2.5rem; color: #28A745; margin-bottom: 1rem; display: block;"></i>
+            <h6 class="card-title">Advanced Security</h6>
+            <p class="card-text">Multi-factor authentication, biometric login, and encrypted transactions keep your money safe.</p>
+        </div>
+    </div>
+
+    <div class="card card-info">
+        <div class="card-body text-center">
+            <i class="bi bi-graph-up" style="font-size: 2.5rem; color: #17A2B8; margin-bottom: 1rem; display: block;"></i>
+            <h6 class="card-title">Smart Analytics</h6>
+            <p class="card-text">Track spending patterns, get insights, and achieve your financial goals with our analytics tools.</p>
+        </div>
+    </div>
+
+    <div class="card card-warning">
+        <div class="card-body text-center">
+            <i class="bi bi-clock-history" style="font-size: 2.5rem; color: #FFC107; margin-bottom: 1rem; display: block;"></i>
+            <h6 class="card-title">24/7 Support</h6>
+            <p class="card-text">Our support team is always available to help with any questions or issues you may have.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Carousel Auto-scroll Enhancement
+    const carousel = new bootstrap.Carousel(document.getElementById('dashboardCarousel'), {
+        interval: 5000,
+        pause: 'hover',
+        ride: 'carousel',
+        wrap: true
+    });
+
+    // Add smooth fade animation to carousel items
+    document.addEventListener('DOMContentLoaded', function() {
+        const items = document.querySelectorAll('.carousel-item');
+        items.forEach(item => {
+            item.style.transition = 'opacity 1s ease-in-out';
+        });
+    });
+</script>

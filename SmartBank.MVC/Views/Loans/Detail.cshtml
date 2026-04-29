@@ -1,0 +1,126 @@
+@model SmartBank.MVC.ViewModels.LoanDetailViewModel
+@{ ViewData["Title"] = "Loan Detail"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+@{
+    var statusColor = Model.Status switch
+    {
+        "Approved" => "success",
+        "Rejected" => "danger",
+        _ => "warning"
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">
+        <i class="bi bi-cash-stack me-2"></i>Loan Details
+    </h4>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back
+    </a>
+</div>
+
+<div class="row g-4">
+
+    <!-- Status Card -->
+    <div class="col-md-4">
+        <div class="card p-4 text-center border-@statusColor">
+            <small class="text-muted">Loan Amount</small>
+            <h2 class="fw-bold text-@statusColor">₹@Model.Amount.ToString("N2")</h2>
+            <span class="badge bg-@statusColor fs-6 mb-3">@Model.Status</span>
+
+            <hr />
+
+            <div class="d-flex justify-content-between py-1">
+                <small class="text-muted">Monthly EMI</small>
+                <small class="fw-bold">₹@Model.MonthlyPayment.ToString("N2")</small>
+            </div>
+            <div class="d-flex justify-content-between py-1">
+                <small class="text-muted">Term</small>
+                <small class="fw-bold">@Model.TermMonths months</small>
+            </div>
+            <div class="d-flex justify-content-between py-1">
+                <small class="text-muted">Total Payable</small>
+                <small class="fw-bold">
+                    ₹@((Model.MonthlyPayment * Model.TermMonths).ToString("N2"))
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loan Info -->
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h6 class="fw-bold mb-3">Application Details</h6>
+            <table class="table table-borderless mb-0">
+                <tbody>
+                    <tr>
+                        <td class="text-muted" style="width:40%">Loan ID</td>
+                        <td class="fw-semibold">#@Model.LoanId</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Applicant</td>
+                        <td class="fw-semibold">@Model.ApplicantName</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Purpose</td>
+                        <td class="fw-semibold">@Model.Purpose</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Applied On</td>
+                        <td class="fw-semibold">
+                            @Model.AppliedAt.ToString("dd MMM yyyy, hh:mm tt")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Reviewed On</td>
+                        <td class="fw-semibold">
+                            @(Model.ReviewedAt.HasValue
+                                ? Model.ReviewedAt.Value.ToString("dd MMM yyyy, hh:mm tt")
+                                : "Pending review")
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Status Timeline -->
+        <div class="card p-4 mt-3">
+            <h6 class="fw-bold mb-3">Application Timeline</h6>
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex gap-3 align-items-start">
+                    <div class="rounded-circle bg-success d-flex align-items-center
+                                justify-content-center flex-shrink-0"
+                         style="width:32px;height:32px">
+                        <i class="bi bi-check text-white small"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold small">Application Submitted</div>
+                        <div class="text-muted" style="font-size:.8rem">
+                            @Model.AppliedAt.ToString("dd MMM yyyy")
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 align-items-start">
+                    <div class="rounded-circle bg-@(Model.Status == "Pending" ? "warning" : statusColor)
+                                d-flex align-items-center justify-content-center flex-shrink-0"
+                         style="width:32px;height:32px">
+                        <i class="bi bi-@(Model.Status == "Pending" ? "hourglass-split" :
+                                          Model.Status == "Approved" ? "check" : "x")
+                           text-white small"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold small">
+                            @(Model.Status == "Pending" ? "Under Review" : $"Loan {Model.Status}")
+                        </div>
+                        <div class="text-muted" style="font-size:.8rem">
+                            @(Model.ReviewedAt.HasValue
+                                ? Model.ReviewedAt.Value.ToString("dd MMM yyyy")
+                                : "Awaiting manager review")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

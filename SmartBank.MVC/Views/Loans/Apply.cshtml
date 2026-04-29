@@ -1,0 +1,125 @@
+@model SmartBank.MVC.ViewModels.LoanApplyViewModel
+@{ ViewData["Title"] = "Apply for Loan"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row justify-content-center mt-2">
+    <div class="col-md-7">
+        <div class="card p-4">
+            <div class="text-center mb-4">
+                <i class="bi bi-cash-stack text-warning" style="font-size:2.5rem"></i>
+                <h4 class="mt-2 fw-bold">Apply for a Loan</h4>
+                <p class="text-muted small">Fill in the details below to submit your application</p>
+            </div>
+
+            <form asp-action="Apply" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger py-2 small"></div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Amount" class="form-label fw-semibold">
+                            Loan Amount (₹)
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input asp-for="Amount" type="number" step="1000"
+                                   class="form-control" placeholder="e.g. 100000" />
+                        </div>
+                        <span asp-validation-for="Amount" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="TermMonths" class="form-label fw-semibold">
+                            Loan Term (Months)
+                        </label>
+                        <select asp-for="TermMonths" class="form-select" id="termSelect">
+                            <option value="">Select term</option>
+                            @foreach (var t in new[] { 3, 6, 12, 24, 36, 48, 60, 120, 180, 240 })
+                            {
+                                <option value="@t">@t months (@(t/12 > 0 ? $"{t/12} yr" : "") @(t%12 > 0 ? $"{t%12} mo" : ""))</option>
+                            }
+                        </select>
+                        <span asp-validation-for="TermMonths" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- EMI Preview -->
+                <div class="alert alert-light border mb-3" id="emiPreview" style="display:none">
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted small">Estimated Monthly Payment (EMI)</span>
+                        <span class="fw-bold text-primary" id="emiAmount">₹0</span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Purpose" class="form-label fw-semibold">
+                        Loan Purpose
+                    </label>
+                    <input asp-for="Purpose" class="form-control"
+                           placeholder="e.g. Home renovation, education, medical..." />
+                    <span asp-validation-for="Purpose" class="text-danger small"></span>
+                </div>
+
+                <!-- Quick Purpose Presets -->
+                <div class="mb-4">
+                    <small class="text-muted d-block mb-2">Quick presets</small>
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var p in new[] {
+                            "Home Renovation", "Education",
+                            "Medical Emergency", "Vehicle Purchase", "Business"
+                        })
+                        {
+                            <button type="button" class="btn btn-outline-secondary btn-sm preset-btn"
+                                    data-purpose="@p">
+                                @p
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <div class="alert alert-light border small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Applications are reviewed within 2-3 business days.
+                    You may only have one pending application at a time.
+                </div>
+
+                <div class="d-flex gap-2 mt-3">
+                    <button type="submit" class="btn btn-warning flex-grow-1 text-dark fw-semibold">
+                        <i class="bi bi-send me-1"></i> Submit Application
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const amountInput = document.getElementById('Amount');
+        const termSelect = document.getElementById('termSelect');
+        const emiPreview = document.getElementById('emiPreview');
+        const emiAmount = document.getElementById('emiAmount');
+
+        function updateEmi() {
+            const amount = parseFloat(amountInput.value) || 0;
+            const term = parseInt(termSelect.value) || 0;
+            if (amount > 0 && term > 0) {
+                const emi = (amount / term).toFixed(2);
+                emiAmount.textContent = '₹' + parseFloat(emi).toLocaleString('en-IN',
+                    { minimumFractionDigits: 2 });
+                emiPreview.style.display = 'block';
+            } else {
+                emiPreview.style.display = 'none';
+            }
+        }
+
+        amountInput.addEventListener('input', updateEmi);
+        termSelect.addEventListener('change', updateEmi);
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('Purpose').value = btn.dataset.purpose;
+            });
+        });
+    </script>
+}

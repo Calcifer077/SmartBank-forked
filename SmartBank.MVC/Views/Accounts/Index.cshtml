@@ -1,0 +1,83 @@
+@model SmartBank.MVC.ViewModels.AccountListViewModel
+@{ ViewData["Title"] = "My Accounts"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1><i class="bi bi-wallet2 me-2"></i>My Accounts</h1>
+        <p>Manage all your bank accounts in one place</p>
+    </div>
+    @if (!Model.HasSavings || !Model.HasCurrent)
+    {
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Open New Account
+        </a>
+    }
+</div>
+
+@if (!Model.Accounts.Any())
+{
+    <div class="card p-5 text-center shadow-md border-0">
+        <div style="font-size: 4rem; color: #005EB8; margin-bottom: 1rem;">
+            <i class="bi bi-wallet2"></i>
+        </div>
+        <h5 class="fw-bold text-dark mb-2">No accounts yet</h5>
+        <p class="text-muted mb-3">Open your first account to get started with SmartBank.</p>
+        <a asp-action="Create" class="btn btn-primary mx-auto">
+            <i class="bi bi-plus-circle me-1"></i> Open Your First Account
+        </a>
+    </div>
+}
+else
+{
+    <div class="cards-grid">
+        @foreach (var account in Model.Accounts)
+        {
+            var cardClass = account.AccountType == "Savings" ? "card-success" : "card-info";
+            var iconColor = account.AccountType == "Savings" ? "#28A745" : "#17A2B8";
+            var icon = account.AccountType == "Savings" ? "piggy-bank" : "briefcase";
+
+            <div class="card @cardClass shadow-soft transition-smooth">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="badge bg-primary mb-2">@account.AccountType Account</span>
+                            <p class="text-muted small mb-0"><i class="bi bi-hash me-1"></i>@account.AccountNumber</p>
+                        </div>
+                        <div style="font-size: 2rem; color: @iconColor;">
+                            <i class="bi bi-@icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h2 class="fw-bold text-dark mb-0">
+                            ₹@account.Balance.ToString("N2")
+                        </h2>
+                        <small class="text-muted">Available Balance</small>
+                    </div>
+
+                    <hr class="my-3 opacity-50" />
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        @{
+                            var statusBadge = account.Status == "Active" ? "success" :
+                                              account.Status == "Frozen" ? "warning" : "danger";
+                        }
+                        <span class="badge bg-@statusBadge">@account.Status</span>
+                        <a asp-action="Detail" asp-route-id="@account.AccountId"
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-eye me-1"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (Model.HasSavings && Model.HasCurrent)
+    {
+        <div class="alert alert-info mt-4 shadow-soft border-0">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Account Limit Reached</strong> — You have both Savings and Current accounts. No further accounts can be opened.
+        </div>
+    }
+}

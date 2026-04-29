@@ -1,0 +1,82 @@
+@model SmartBank.MVC.ViewModels.LoginViewModel
+@{ ViewData["Title"] = "Login"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="login-container">
+    <div class="col-lg-4 col-md-6 col-sm-8">
+        <div class="card login-card">
+            <div class="card-body p-5">
+                <!-- Login Header -->
+                <div class="login-header">
+                    <div class="icon">
+                        <i class="bi bi-bank2"></i>
+                    </div>
+                    <h4>SmartBank</h4>
+                    <p class="text-muted small">Secure Banking at Your Fingertips</p>
+                </div>
+
+                <!-- Login Form -->
+                <form asp-action="Login" method="post">
+                    @Html.AntiForgeryToken()
+                    
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-circle-fill me-2"></i>
+                            @ViewBag.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" style="display:none;"></div>
+
+                    <div class="mb-4">
+                        <label asp-for="Email" class="form-label fw-semibold mb-2">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="border-radius: 8px 0 0 8px; border: 2px solid #e9ecef; background: transparent;">
+                                <i class="bi bi-envelope text-muted"></i>
+                            </span>
+                            <input asp-for="Email" class="form-control" placeholder="you@example.com" style="border-radius: 0 8px 8px 0;" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label fw-semibold mb-2">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="border-radius: 8px 0 0 8px; border: 2px solid #e9ecef; background: transparent;">
+                                <i class="bi bi-lock text-muted"></i>
+                            </span>
+                            <input asp-for="Password" class="form-control" placeholder="••••••••" style="border-radius: 0 8px 8px 0;" />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-login w-100 mt-4 mb-3">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Sign In
+                    </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="divider">
+                    <span>New to SmartBank?</span>
+                </div>
+
+                <!-- Register Link -->
+                <div class="register-link">
+                    <p class="text-muted small mb-0">
+                        Don't have an account?
+                        <a asp-controller="Auth" asp-action="Register">Create one now</a>
+                    </p>
+                </div>
+
+                <!-- Footer Note -->
+                <div class="text-center mt-4">
+                    <small class="text-muted d-block">
+                        <i class="bi bi-shield-check me-1"></i>
+                        Secure. Fast. Reliable.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

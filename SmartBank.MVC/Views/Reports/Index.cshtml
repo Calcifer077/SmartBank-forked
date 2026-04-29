@@ -1,0 +1,64 @@
+@{ ViewData["Title"] = "Reports"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<h4 class="fw-bold mb-4">
+    <i class="bi bi-bar-chart me-2"></i>Reports
+</h4>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <a asp-action="DailyTransactions"
+           class="card p-4 text-decoration-none d-block h-100">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-calendar-check text-primary" style="font-size:2.5rem"></i>
+                <div>
+                    <div class="fw-bold">Daily Transactions</div>
+                    <small class="text-muted">
+                        View all deposits, withdrawals and transfers for any date
+                    </small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-6">
+        <a asp-action="LoanReport"
+           class="card p-4 text-decoration-none d-block h-100">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-cash-stack text-warning" style="font-size:2.5rem"></i>
+                <div>
+                    <div class="fw-bold">Loan Approvals Report</div>
+                    <small class="text-muted">
+                        All loan applications with status and amounts
+                    </small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-6">
+        <a asp-action="ActiveCustomers"
+           class="card p-4 text-decoration-none d-block h-100">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-people text-success" style="font-size:2.5rem"></i>
+                <div>
+                    <div class="fw-bold">Active Customers</div>
+                    <small class="text-muted">
+                        All active registered customers with account counts
+                    </small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-6">
+        <a asp-action="LowBalance"
+           class="card p-4 text-decoration-none d-block h-100">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-exclamation-triangle text-danger" style="font-size:2.5rem"></i>
+                <div>
+                    <div class="fw-bold">Low Balance Accounts</div>
+                    <small class="text-muted">
+                        Accounts below threshold — default ₹1,000
+                    </small>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>

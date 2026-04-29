@@ -1,0 +1,91 @@
+@model SmartBank.MVC.ViewModels.TicketCreateViewModel
+@{ ViewData["Title"] = "Raise Ticket"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row justify-content-center mt-2">
+    <div class="col-md-7">
+        <div class="card p-4">
+            <div class="text-center mb-4">
+                <i class="bi bi-headset text-primary" style="font-size:2.5rem"></i>
+                <h4 class="mt-2 fw-bold">Raise a Support Ticket</h4>
+                <p class="text-muted small">
+                    Describe your issue and our team will get back to you
+                </p>
+            </div>
+
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger py-2 small"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Subject" class="form-label fw-semibold">Subject</label>
+                    <input asp-for="Subject" class="form-control"
+                           placeholder="Brief summary of your issue" />
+                    <span asp-validation-for="Subject" class="text-danger small"></span>
+                </div>
+
+                <!-- Quick subject presets -->
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-2">Common issues</small>
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var s in new[] {
+                            "Transaction not reflected",
+                            "Account frozen",
+                            "Loan status query",
+                            "Unable to login",
+                            "Wrong balance shown"
+                        })
+                        {
+                            <button type="button"
+                                    class="btn btn-outline-secondary btn-sm subject-preset"
+                                    data-subject="@s">
+                                @s
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Description" class="form-label fw-semibold">
+                        Description
+                    </label>
+                    <textarea asp-for="Description" class="form-control" rows="5"
+                              placeholder="Describe your issue in detail..."></textarea>
+                    <div class="d-flex justify-content-between">
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                        <small class="text-muted" id="charCount">0 / 1000</small>
+                    </div>
+                </div>
+
+                <div class="alert alert-light border small">
+                    <i class="bi bi-clock me-1"></i>
+                    Our support team typically responds within 24 business hours.
+                </div>
+
+                <div class="d-flex gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary flex-grow-1">
+                        <i class="bi bi-send me-1"></i> Submit Ticket
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const textarea = document.getElementById('Description');
+        const counter = document.getElementById('charCount');
+
+        textarea.addEventListener('input', () => {
+            counter.textContent = textarea.value.length + ' / 1000';
+        });
+
+        document.querySelectorAll('.subject-preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('Subject').value = btn.dataset.subject;
+            });
+        });
+    </script>
+}

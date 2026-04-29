@@ -1,0 +1,522 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — SmartBank</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/modern-bank.css" />
+    <style>
+        :root {
+            --primary-blue: #005EB8;
+            --secondary-blue: #1B5BAA;
+            --accent-orange: #FF6B35;
+            --success-green: #28A745;
+            --warning-yellow: #FFC107;
+            --danger-red: #DC3545;
+            --bg-light: #F8F9FA;
+            --bg-white: #FFFFFF;
+            --text-dark: #2C3E50;
+            --text-muted: #7F8C8D;
+            --border-light: #E8ECEF;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Light Mode */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: linear-gradient(135deg, #F8F9FA 0%, #EFF2F7 100%);
+            color: var(--text-dark);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            box-shadow: var(--shadow-md);
+            border-bottom: 3px solid var(--accent-orange);
+            padding: 0.75rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.6rem;
+            color: white !important;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-brand i {
+            font-size: 2rem;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            margin-left: 0.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--accent-orange);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .sidebar {
+            min-height: calc(100vh - 60px);
+            background: linear-gradient(180deg, #1a3a5c 0%, #0f2438 100%);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem 0;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.75);
+            padding: 0.8rem 1.2rem;
+            margin: 0.3rem 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background: linear-gradient(90deg, rgba(255, 107, 53, 0.2) 0%, rgba(0, 94, 184, 0.2) 100%);
+            border-left: 4px solid var(--accent-orange);
+            padding-left: 1.1rem;
+            transform: translateX(4px);
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            background: var(--bg-white);
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            border: none;
+            font-weight: 600;
+            padding: 0.6rem 1.4rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(90deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-outline-primary {
+            color: var(--primary-blue);
+            border-color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-blue);
+            border-color: var(--primary-blue);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .alert-success-toast {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 9999;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e9ecef;
+        }
+
+        body.dark-mode .navbar {
+            background: linear-gradient(90deg, #0a2847 0%, #091f35 100%);
+            border-bottom-color: #FF6B35;
+        }
+
+        body.dark-mode .sidebar {
+            background: linear-gradient(180deg, #0d1f2d 0%, #081620 100%);
+        }
+
+        body.dark-mode .card {
+            background-color: #2d3561;
+            color: #e9ecef;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .card-body {
+            background-color: #2d3561;
+        }
+
+        body.dark-mode .card-header {
+            background: linear-gradient(90deg, #1a3a5c 0%, #0f2438 100%) !important;
+        }
+
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background-color: #3a4578;
+            color: #e9ecef;
+            border-color: #4a5590;
+        }
+
+        body.dark-mode .form-control:focus,
+        body.dark-mode .form-select:focus {
+            background-color: #3a4578;
+            color: #e9ecef;
+            border-color: #005EB8;
+            box-shadow: 0 0 0 0.25rem rgba(0, 94, 184, 0.25);
+        }
+
+        body.dark-mode .text-muted {
+            color: #b0b5c7 !important;
+        }
+
+        body.dark-mode .btn-outline-light {
+            color: #e9ecef;
+            border-color: #e9ecef;
+        }
+
+        body.dark-mode .btn-outline-light:hover {
+            background-color: #e9ecef;
+            color: #1a237e;
+        }
+
+        body.dark-mode a {
+            color: #64b5f6;
+        }
+
+        body.dark-mode a:hover {
+            color: #90caf9;
+        }
+
+        /* Dark Mode Toggle Button */
+        .dark-mode-toggle {
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: transform 0.2s ease;
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Login Page Enhancements */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body.dark-mode .login-container {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+        }
+
+        .login-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header .icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        body.dark-mode .login-header .icon {
+            background: linear-gradient(135deg, #1a237e 0%, #667eea 100%);
+        }
+
+        .login-header h4 {
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-login {
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: #e9ecef;
+        }
+
+        .divider span {
+            padding: 0 1rem;
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        body.dark-mode .divider::before,
+        body.dark-mode .divider::after {
+            background-color: #4a5590;
+        }
+
+        body.dark-mode .divider span {
+            color: #b0b5c7;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        body.dark-mode .register-link {
+            border-top-color: #4a5590;
+        }
+
+        .register-link a {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .register-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-primary px-3">
+        <a class="navbar-brand" asp-controller="Dashboard" asp-action="Index">
+            <i class="bi bi-bank2"></i> SmartBank
+        </a>
+        <div class="d-flex align-items-center gap-3">
+            @if (Context.Session.GetString("JwtToken") != null)
+            {
+                <span class="text-white small">
+                    <i class="bi bi-person-circle"></i>
+                    @Context.Session.GetString("UserName")
+                    <span class="badge bg-light text-primary ms-1">
+                        @Context.Session.GetString("UserRole")
+                    </span>
+                </span>
+            }
+            <button class="btn btn-sm btn-outline-light dark-mode-toggle" id="darkModeToggle" title="Toggle Dark Mode">
+                <i class="bi bi-moon-fill"></i>
+            </button>
+            @if (Context.Session.GetString("JwtToken") != null)
+            {
+                <form asp-controller="Auth" asp-action="Logout" method="post" class="m-0">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </form>
+            }
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <!-- Sidebar — only when logged in -->
+            @if (Context.Session.GetString("JwtToken") != null)
+            {
+                <nav class="col-md-2 sidebar pt-3 d-none d-md-block">
+                    <ul class="nav flex-column gap-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Dashboard" asp-action="Index">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Profile" asp-action="Index">
+                                <i class="bi bi-person"></i> My Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Accounts" asp-action="Index">
+                                <i class="bi bi-wallet2"></i> My Accounts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Transactions" asp-action="Transfer"
+                            asp-route-accountId="0">
+                            <i class="bi bi-arrow-left-right"></i> Transfers
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Loans" asp-action="Index">
+                                <i class="bi bi-cash-stack"></i> Loans
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Support" asp-action="Index">
+                                <i class="bi bi-headset"></i> Support
+                            </a>
+                        </li>
+                        @if (Context.Session.GetString("UserRole") == "Admin")
+                        {
+                            <hr class="border-white opacity-25 my-2" />
+                            <small class="text-white opacity-50 ps-3 small">ADMIN</small>
+                            <li class="nav-item mt-1">
+                                <a class="nav-link" asp-controller="Admin" asp-action="Index">
+                                    <i class="bi bi-shield-check"></i> Admin Panel
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Reports" asp-action="Index">
+                                    <i class="bi bi-bar-chart"></i> Reports
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+
+            <!-- Main content -->
+            <main class="col-md-@(Context.Session.GetString("JwtToken") != null ? "10" : "12") py-4 px-4">
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @RenderBody()
+    <script>
+        // Dark Mode Toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const html = document.documentElement;
+
+        // Load dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            darkModeToggle.innerHTML = '<i class="bi bi-sun-fill"></i>';
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            darkModeToggle.innerHTML = isDarkMode ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-fill"></i>';
+        });
+    </script>
+            </main>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
