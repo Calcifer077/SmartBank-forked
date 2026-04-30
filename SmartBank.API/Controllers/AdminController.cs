@@ -34,6 +34,30 @@ namespace SmartBank.API.Controllers
             return Ok(ApiResponse<List<AdminUserDto>>.Ok(result));
         }
 
+        // GET /api/admin/accounts
+        [HttpGet("accounts")]
+        public async Task<IActionResult> Accounts()
+        {
+            var result = await _adminService.GetAllAccountsAsync();
+            return Ok(ApiResponse<List<AdminAccountDto>>.Ok(result));
+        }
+
+        // GET /api/admin/roles
+        [HttpGet("roles")]
+        public async Task<IActionResult> GetRoles()
+        {
+            var result = await _adminService.GetAllRolesAsync();
+            return Ok(ApiResponse<List<RoleDto>>.Ok(result));
+        }
+
+        // POST /api/admin/change-role
+        [HttpPost("change-role")]
+        public async Task<IActionResult> ChangeRole([FromBody] ChangeRoleDto dto)
+        {
+            var message = await _adminService.ChangeUserRoleAsync(dto);
+            return Ok(ApiResponse<object>.Ok(null!, message));
+        }
+
         // POST /api/admin/freeze
         [HttpPost("freeze")]
         public async Task<IActionResult> Freeze([FromBody] FreezeAccountDto dto)

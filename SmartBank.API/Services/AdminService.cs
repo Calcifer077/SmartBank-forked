@@ -66,6 +66,26 @@ namespace SmartBank.API.Services
                 .ToListAsync();
         }
 
+        public async Task<List<AdminAccountDto>> GetAllAccountsAsync()
+        {
+            return await _db.Accounts
+                .Include(a => a.User)
+                .OrderByDescending(a => a.OpenedAt)
+                .Select(a => new AdminAccountDto
+                {
+                    AccountId = a.AccountId,
+                    AccountNumber = a.AccountNumber,
+                    AccountType = a.AccountType,
+                    Status = a.Status,
+                    Balance = a.Balance,
+                    UserId = a.UserId,
+                    UserName = a.User.FullName,
+                    UserEmail = a.User.Email,
+                    OpenedAt = a.OpenedAt
+                })
+                .ToListAsync();
+        }
+
         public async Task<string> FreezeAccountAsync(FreezeAccountDto dto)
         {
             var allowed = new[] { "Freeze", "Unfreeze" };
@@ -103,6 +123,53 @@ namespace SmartBank.API.Services
                 "Account {AccountId} {Action} by admin", dto.AccountId, dto.Action);
 
             return $"Account {newStatus} successfully.";
+        }
+
+        public async Task<List<RoleDto>> GetAllRolesAsync()
+        {
+            return await _db.Roles
+                .OrderBy(r => r.RoleId)
+                .Select(r => new RoleDto
+                {
+                    RoleId = r.RoleId,
+                    RoleName = r.RoleName
+                })
+                .ToListAsync();
+        }
+
+        public async Task<string> ChangeUserRoleAsync(ChangeRoleDto dto)
+        {
+            var user = await _db.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.UserId == dto.UserId)
+                ?? throw new KeyNotFoundException("User not found.");
+
+            var newRole = await _db.Roles.FindAsync(dto.RoleId)
+                ?? throw new KeyNotFoundException("Role not found.");
+
+            if (user.RoleId == dto.RoleId)
+                throw new InvalidOperationException(
+                    $"User already has {newRole.RoleName} role.");
+
+            var oldRole = user.Role.RoleName;
+            user.RoleId = dto.RoleId;
+
+            // Notify user of role change
+            _db.Notifications.Add(new Notification
+            {
+                UserId = user.UserId,
+                Title = "Role Changed",
+                Message = $"Your role has been changed from {oldRole} to {newRole.RoleName} by an administrator.",
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _db.SaveChangesAsync();
+
+            _logger.LogInformation(
+                "User {UserId} role changed from {OldRole} to {NewRole} by admin", 
+                dto.UserId, oldRole, newRole.RoleName);
+
+            return $"User role changed to {newRole.RoleName} successfully.";
         }
     }
 }

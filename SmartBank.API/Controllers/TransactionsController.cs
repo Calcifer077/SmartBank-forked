@@ -74,6 +74,14 @@ namespace SmartBank.API.Controllers
             return Ok(ApiResponse<List<TransactionResponseDto>>.Ok(result));
         }
 
+        // GET /api/transactions/passbook/{accountId}
+        [HttpGet("passbook/{accountId:int}")]
+        public async Task<IActionResult> GetPassbook(int accountId, [FromQuery] int numberOfTransactions = 10)
+        {
+            var result = await _txService.GetPassbookDataAsync(GetUserId(), accountId, numberOfTransactions);
+            return Ok(ApiResponse<PassbookDataDto>.Ok(result));
+        }
+
         // ── Helper ────────────────────────────────────────────────────
         private int GetUserId()
         {

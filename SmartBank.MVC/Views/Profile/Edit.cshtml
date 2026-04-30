@@ -1,0 +1,61 @@
+@model SmartBank.MVC.ViewModels.ProfileViewModel
+@{ ViewData["Title"] = "Edit Profile"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<h4 class="fw-bold mb-4"><i class="bi bi-pencil-square me-2"></i>Edit Profile</h4>
+
+<div class="row g-4">
+    <div class="col-md-8">
+        <div class="card p-4">
+            <form asp-action="Update" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Email Address</label>
+                    <input type="email" class="form-control" value="@Model.Email" disabled />
+                    <small class="text-muted d-block mt-1">
+                        <i class="bi bi-info-circle me-1"></i>Email cannot be changed. Contact support if you need to update it.
+                    </small>
+                </div>
+
+                <div class="mb-4">
+                    <label for="fullName" class="form-label fw-semibold">Full Name</label>
+                    <input type="text" name="fullName" id="fullName" class="form-control" 
+                           value="@Model.FullName" required maxlength="100" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="phoneNumber" class="form-label fw-semibold">Phone Number</label>
+                    <input type="tel" name="phoneNumber" id="phoneNumber" class="form-control" 
+                           value="@Model.PhoneNumber" placeholder="9876543210" maxlength="15" />
+                </div>
+
+                <div class="mb-4">
+                    <label for="address" class="form-label fw-semibold">Address</label>
+                    <textarea name="address" id="address" class="form-control" rows="3" 
+                              maxlength="500" placeholder="123 Main Street, City, Country">@Model.Address</textarea>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-1"></i> Save Changes
+                    </button>
+                    <a asp-controller="Profile" asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-4 bg-light">
+            <h6 class="fw-bold mb-3"><i class="bi bi-info-circle me-2"></i>Tips</h6>
+            <ul class="small text-muted">
+                <li class="mb-2">Keep your full name updated for official records</li>
+                <li class="mb-2">A valid phone number helps with account recovery</li>
+                <li class="mb-2">Your address is used for verification purposes</li>
+                <li>Changes are saved immediately</li>
+            </ul>
+        </div>
+    </div>
+</div>

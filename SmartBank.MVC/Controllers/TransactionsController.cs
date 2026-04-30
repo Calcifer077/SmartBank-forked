@@ -161,6 +161,23 @@ namespace SmartBank.MVC.Controllers
 
             var token = SessionHelper.GetToken(HttpContext.Session);
 
+            // If accountId is 0, get the user's first account
+            if (accountId == 0)
+            {
+                var accountsListResult = await _api.GetAsync<ApiResponseWrapper<AccountListViewModel>>(
+                    "api/accounts/all", token);
+
+                if (accountsListResult?.Data?.Accounts?.Any() == true)
+                {
+                    accountId = accountsListResult.Data.Accounts.First().AccountId;
+                }
+                else
+                {
+                    TempData["Error"] = "You have no accounts yet.";
+                    return RedirectToAction("Index", "Accounts");
+                }
+            }
+
             // Get account detail for header
             var accountResult = await _api.GetAsync<ApiResponseWrapper<AccountDetailViewModel>>(
                 $"api/accounts/{accountId}", token);

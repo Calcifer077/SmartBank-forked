@@ -32,5 +32,46 @@ namespace SmartBank.MVC.Controllers
 
             return View(result.Data);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit()
+        {
+            if (!SessionHelper.IsLoggedIn(HttpContext.Session))
+                return RedirectToAction("Login", "Auth");
+
+            var token = SessionHelper.GetToken(HttpContext.Session);
+            var result = await _api.GetAsync<ApiResponseWrapper<ProfileViewModel>>(
+                "api/profile", token);
+
+            if (result is null || !result.Success || result.Data is null)
+            {
+                TempData["Error"] = "Could not load profile.";
+                return RedirectToAction("Index");
+            }
+
+            return View(result.Data);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(string fullName, string phoneNumber, string address)
+        {
+            if (!SessionHelper.IsLoggedIn(HttpContext.Session))
+                return RedirectToAction("Login", "Auth");
+
+            var token = SessionHelper.GetToken(HttpContext.Session);
+            var updateDto = new { FullName = fullName, PhoneNumber = phoneNumber, Address = address };
+            
+            var result = await _api.PutAsync<ApiResponseWrapper<object>>(
+                "api/profile/update", updateDto, token);
+
+            if (result is null || !result.Success)
+            {
+                TempData["Error"] = result?.Message ?? "Failed to update profile.";
+                return RedirectToAction("Edit");
+            }
+
+            TempData["Success"] = "Profile updated successfully!";
+            return RedirectToAction("Index");
+        }
     }
 }

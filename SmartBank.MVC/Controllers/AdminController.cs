@@ -46,10 +46,25 @@ namespace SmartBank.MVC.Controllers
             });
         }
 
+        // GET /Admin/Accounts
+        public async Task<IActionResult> Accounts()
+        {
+            if (!IsAdmin()) return RedirectToAction("Login", "Auth");
+
+            var token = SessionHelper.GetToken(HttpContext.Session);
+            var result = await _api.GetAsync<ApiResponseWrapper<List<AdminAccountItemViewModel>>>(
+                "api/admin/accounts", token);
+
+            return View(new AdminAccountListViewModel
+            {
+                Accounts = result?.Data ?? new List<AdminAccountItemViewModel>()
+            });
+        }
+
         // POST /Admin/FreezeAccount
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> FreezeAccount(int accountId, string action)
+        public async Task<IActionResult> FreezeAccount(int accountId, string action, string? returnTo = null)
         {
             if (!IsAdmin()) return RedirectToAction("Login", "Auth");
 
@@ -57,6 +72,26 @@ namespace SmartBank.MVC.Controllers
             var result = await _api.PostAsync<ApiResponseWrapper<object>>(
                 "api/admin/freeze",
                 new { AccountId = accountId, Action = action },
+                token);
+
+            TempData[result?.Success == true ? "Success" : "Error"] =
+                result?.Message ?? "Action failed.";
+
+            // Redirect back to the page where the action was triggered from
+            return RedirectToAction(returnTo == "Users" ? "Users" : "Accounts");
+        }
+
+        // POST /Admin/ChangeRole
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeRole(int userId, int roleId)
+        {
+            if (!IsAdmin()) return RedirectToAction("Login", "Auth");
+
+            var token = SessionHelper.GetToken(HttpContext.Session);
+            var result = await _api.PostAsync<ApiResponseWrapper<object>>(
+                "api/admin/change-role",
+                new { UserId = userId, RoleId = roleId },
                 token);
 
             TempData[result?.Success == true ? "Success" : "Error"] =

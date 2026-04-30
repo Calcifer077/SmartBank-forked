@@ -1,0 +1,185 @@
+@using SmartBank.MVC.ViewModels
+@{
+    ViewData["Title"] = "Account Passbook";
+    var accounts = ViewData["Accounts"] as List<AccountForPassbookDto> ?? new List<AccountForPassbookDto>();
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2><i class="bi bi-book"></i> Account Passbook</h2>
+            <p class="text-muted">View transaction history and download your passbook as PDF</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Select Account</h5>
+                </div>
+                <div class="card-body">
+                    @if (accounts != null && accounts.Count > 0)
+                    {
+                        <form id="accountForm">
+                            <div class="mb-3">
+                                <label for="accountSelect" class="form-label">Choose an Account:</label>
+                                <select class="form-select" id="accountSelect" onchange="updateAccountInfo()">
+                                    <option value="">-- Select Account --</option>
+                                    @foreach (var account in accounts)
+                                    {
+                                        <option value="@account.AccountId">
+                                            @account.AccountNumber - @account.AccountType (@account.Status) - ₹@account.Balance
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div id="accountInfo" style="display: none;">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <div class="info-box">
+                                            <small class="text-muted">Account Number</small>
+                                            <p class="mb-0" id="accountNumber">-</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-box">
+                                            <small class="text-muted">Account Type</small>
+                                            <p class="mb-0" id="accountType">-</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <div class="info-box">
+                                            <small class="text-muted">Current Balance</small>
+                                            <p class="mb-0 text-success" id="currentBalance">-</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-box">
+                                            <small class="text-muted">Account Status</small>
+                                            <p class="mb-0" id="accountStatus">-</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr />
+
+                                <div class="mb-3">
+                                    <label for="numberOfTransactions" class="form-label">Number of Transactions to Display:</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="numberOfTransactions" value="10" min="1" max="100" />
+                                        <small class="form-text text-muted d-block">Min: 1, Max: 100</small>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="button" class="btn btn-primary" onclick="viewPassbook()">
+                                        <i class="bi bi-eye"></i> View Passbook
+                                    </button>
+                                    <button type="button" class="btn btn-success" onclick="printPassbook()">
+                                        <i class="bi bi-printer"></i> Print as PDF
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> No accounts found. Please create an account first.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-lightbulb"></i> About Passbook</h6>
+                </div>
+                <div class="card-body">
+                    <p class="small">
+                        A passbook shows your complete transaction history for a selected account. 
+                        You can view the last 1 to 100 transactions and download them as a PDF file.
+                    </p>
+                    <p class="small mb-0">
+                        <strong>Features:</strong>
+                    </p>
+                    <ul class="small">
+                        <li>View transaction details</li>
+                        <li>Download as PDF</li>
+                        <li>Custom number of transactions</li>
+                        <li>Account information included</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .info-box {
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+    }
+</style>
+
+<script>
+    function updateAccountInfo() {
+        const select = document.getElementById('accountSelect');
+        const accountInfo = document.getElementById('accountInfo');
+        
+        if (!select.value) {
+            accountInfo.style.display = 'none';
+            return;
+        }
+
+        const selected = select.options[select.selectedIndex];
+        accountInfo.style.display = 'block';
+
+        // Parse account data from option
+        @if (accounts != null && accounts.Count > 0)
+        {
+            <text>
+            const accounts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(accounts));
+            const account = accounts.find(a => a.accountId == select.value);
+            
+            if (account) {
+                document.getElementById('accountNumber').textContent = account.accountNumber;
+                document.getElementById('accountType').textContent = account.accountType;
+                document.getElementById('currentBalance').textContent = '₹' + parseFloat(account.balance).toFixed(2);
+                document.getElementById('accountStatus').textContent = account.status;
+            }
+            </text>
+        }
+    }
+
+    function viewPassbook() {
+        const accountId = document.getElementById('accountSelect').value;
+        const numberOfTransactions = document.getElementById('numberOfTransactions').value;
+
+        if (!accountId) {
+            alert('Please select an account');
+            return;
+        }
+
+        window.location.href = `/Passbook/View/${accountId}?numberOfTransactions=${numberOfTransactions}`;
+    }
+
+    function printPassbook() {
+        const accountId = document.getElementById('accountSelect').value;
+        const numberOfTransactions = document.getElementById('numberOfTransactions').value;
+
+        if (!accountId) {
+            alert('Please select an account');
+            return;
+        }
+
+        window.location.href = `/Passbook/Print/${accountId}?numberOfTransactions=${numberOfTransactions}`;
+    }
+</script>

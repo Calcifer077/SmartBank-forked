@@ -1,0 +1,106 @@
+@model SmartBank.MVC.ViewModels.AdminAccountListViewModel
+@{ ViewData["Title"] = "Manage Accounts"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">
+        <i class="bi bi-credit-card me-2"></i>Manage Accounts
+        <span class="badge bg-primary ms-2">@Model.Accounts.Count</span>
+    </h4>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Dashboard
+    </a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4">#</th>
+                    <th>Account Info</th>
+                    <th>Owner</th>
+                    <th>Type</th>
+                    <th class="text-end">Balance</th>
+                    <th>Opened</th>
+                    <th class="text-center">Status</th>
+                    <th class="pe-4 text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Accounts.Any())
+                {
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            No accounts found
+                        </td>
+                    </tr>
+                }
+                @foreach (var account in Model.Accounts)
+                {
+                    var statusClass = account.Status == "Active" ? "success" :
+                                      account.Status == "Frozen" ? "danger" : "secondary";
+                    <tr class="@(account.Status == "Frozen" ? "table-danger opacity-50" : "")">
+                        <td class="ps-4 text-muted small">#@account.AccountId</td>
+                        <td>
+                            <div class="fw-semibold font-monospace">@account.AccountNumber</div>
+                            <div class="text-muted small">Opened: @account.OpenedAt.ToString("dd MMM yyyy")</div>
+                        </td>
+                        <td>
+                            <div class="fw-semibold">@account.UserName</div>
+                            <div class="text-muted small">@account.UserEmail</div>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">@account.AccountType</span>
+                        </td>
+                        <td class="text-end">
+                            <span class="fw-semibold">₹@account.Balance.ToString("N2")</span>
+                        </td>
+                        <td class="text-muted small">@account.OpenedAt.ToString("dd MMM yyyy")</td>
+                        <td class="text-center">
+                            <span class="badge bg-@statusClass">@account.Status</span>
+                        </td>
+                        <td class="pe-4 text-center">
+                            @if (account.Status == "Active")
+                            {
+                                <form asp-action="FreezeAccount" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="accountId" value="@account.AccountId" />
+                                    <input type="hidden" name="action" value="Freeze" />
+                                    <input type="hidden" name="returnTo" value="Accounts" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                            title="Freeze this account"
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            onclick="return confirm('Freeze this account? The owner will not be able to perform transactions.');">
+                                        <i class="bi bi-lock"></i> Freeze
+                                    </button>
+                                </form>
+                            }
+                            else if (account.Status == "Frozen")
+                            {
+                                <form asp-action="FreezeAccount" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="accountId" value="@account.AccountId" />
+                                    <input type="hidden" name="action" value="Unfreeze" />
+                                    <input type="hidden" name="returnTo" value="Accounts" />
+                                    <button type="submit" class="btn btn-sm btn-outline-success"
+                                            title="Unfreeze this account"
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            onclick="return confirm('Are you sure you want to unfreeze this account?');">
+                                        <i class="bi bi-unlock"></i> Unfreeze
+                                    </button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="mt-4">
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>Account Management</strong> — Use the freeze option to temporarily disable an account. Users can request to unfreeze their accounts through support.
+    </div>
+</div>

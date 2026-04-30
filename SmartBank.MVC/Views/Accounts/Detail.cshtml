@@ -4,6 +4,7 @@
 @{
     var cardColor = Model.AccountType == "Savings" ? "primary" : "success";
     var icon = Model.AccountType == "Savings" ? "piggy-bank" : "briefcase";
+    var isFrozen = Model.Status == "Frozen";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -15,21 +16,35 @@
     </a>
 </div>
 
+@if (isFrozen)
+{
+    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        <div class="d-flex align-items-start">
+            <i class="bi bi-lock-fill me-3" style="font-size: 1.3rem;"></i>
+            <div>
+                <strong>Account Frozen</strong>
+                <p class="mb-2">This account has been frozen and cannot be used for transactions. All withdrawal, deposit, and transfer operations are disabled.</p>
+                <p class="mb-0 small">If you believe this is an error, please <a href="/Support" class="alert-link">contact support</a> for assistance.</p>
+            </div>
+        </div>
+    </div>
+}
+
 <div class="row g-4">
 
     <!-- Balance Card -->
     <div class="col-md-4">
-        <div class="card p-4 bg-@cardColor text-white text-center">
-            <small class="opacity-75 mb-1">Available Balance</small>
+        <div class="card p-4 @(isFrozen ? "bg-danger" : "bg-" + cardColor) text-white text-center">
+            <small class="opacity-75 mb-1">@(isFrozen ? "Frozen Balance" : "Available Balance")</small>
             <h2 class="fw-bold mb-0">₹@Model.Balance.ToString("N2")</h2>
             <hr class="border-white opacity-25" />
-            <span class="badge bg-white text-@cardColor fs-6">@Model.AccountType</span>
+            <span class="badge bg-white @(isFrozen ? "text-danger" : "text-" + cardColor) fs-6">@Model.AccountType</span>
         </div>
 
         <div class="card p-3 mt-3">
             @{
                 var statusClass = Model.Status == "Active" ? "success" :
-                                  Model.Status == "Frozen" ? "warning" : "danger";
+                                  Model.Status == "Frozen" ? "danger" : "danger";
             }
             <div class="d-flex justify-content-between py-1">
                 <small class="text-muted">Status</small>

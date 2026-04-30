@@ -113,6 +113,34 @@ namespace SmartBank.API.Services
             loan.Status = dto.Decision;
             loan.ReviewedAt = DateTime.UtcNow;
 
+            // If approved, add loan amount to user's account
+            if (dto.Decision == "Approved")
+            {
+                var userAccount = await _db.Accounts
+                    .FirstOrDefaultAsync(a => a.UserId == loan.UserId && a.Status == "Active");
+
+                if (userAccount is not null)
+                {
+                    var balanceBefore = userAccount.Balance;
+                    userAccount.Balance += loan.Amount;
+
+                    // Create a transaction record for the loan disbursement
+                    _db.Transactions.Add(new Transaction
+                    {
+                        AccountId = userAccount.AccountId,
+                        Type = "Deposit",
+                        Amount = loan.Amount,
+                        BalanceAfter = userAccount.Balance,
+                        Description = $"Loan Disbursement - Loan ID: {loan.LoanId}",
+                        CreatedAt = DateTime.UtcNow
+                    });
+
+                    _logger.LogInformation(
+                        "Loan amount ₹{Amount} added to account {AccountId}", 
+                        loan.Amount, userAccount.AccountId);
+                }
+            }
+
             // Notify applicant
             _db.Notifications.Add(new Notification
             {
@@ -120,7 +148,7 @@ namespace SmartBank.API.Services
                 Title = $"Loan {dto.Decision}",
                 Message = dto.Decision == "Approved"
                     ? $"Congratulations! Your loan of ₹{loan.Amount:N2} " +
-                      $"has been approved."
+                      $"has been approved and added to your account."
                     : $"Your loan application of ₹{loan.Amount:N2} " +
                       $"has been rejected. Contact support for details.",
                 CreatedAt = DateTime.UtcNow

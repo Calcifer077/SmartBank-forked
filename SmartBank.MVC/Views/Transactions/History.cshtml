@@ -103,7 +103,23 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <small class="text-muted">@tx.Description</small>
+                                    <div class="text-muted">
+                                        <small class="d-block">@tx.Description</small>
+                                        @if (!string.IsNullOrEmpty(tx.OtherPartyName))
+                                        {
+                                            <small class="text-primary fw-semibold d-block mt-1">
+                                                @if (tx.Type == "Transfer Out")
+                                                {
+                                                    <text><i class="bi bi-arrow-right"></i> To: @tx.OtherPartyName</text>
+                                                }
+                                                else if (tx.Type == "Transfer In")
+                                                {
+                                                    <text><i class="bi bi-arrow-left"></i> From: @tx.OtherPartyName</text>
+                                                }
+                                            </small>
+                                            <small class="text-muted font-monospace d-block">@tx.OtherPartyAccountNumber</small>
+                                        }
+                                    </div>
                                 </td>
                                 <td class="text-end fw-bold @amtColor">
                                     <small>@amtPrefix ₹</small>@tx.Amount.ToString("N2")
