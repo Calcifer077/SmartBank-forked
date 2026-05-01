@@ -1,98 +1,64 @@
-name: SmartBank CI/CD Pipeline
+name: SmartBank CI/CD
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
+
+env:
+  DOTNET_VERSION: '9.0.x'          # Change to match your .NET version
+  API_PROJECT: 'SmartBank.API/SmartBank.API.csproj'
+  MVC_PROJECT: 'SmartBank.MVC/SmartBank.MVC.csproj'
+  TEST_PROJECT: 'SmartBank.Tests/SmartBank.Tests.csproj'
 
 jobs:
-  # ─────────────────────────────────────────────────────────────
-  # JOB 1 — Build & Test
-  # ─────────────────────────────────────────────────────────────
-  build-and-test:
-    name: Build & Run Tests
+  build-test-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    # ── 1. Checkout ──────────────────────────────────────────────
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Setup .NET 9
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "9.0.x"
+    # ── 2. Setup .NET ─────────────────────────────────────────────
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Restore dependencies
-        run: dotnet restore SmartBank.slnx # ← explicit target, avoids picking up nested .sln files
+    # ── 3. Restore ────────────────────────────────────────────────
+    - name: Restore dependencies
+      run: dotnet restore SmartBank.slnx
 
-      - name: Build — Release
-        run: dotnet build SmartBank.slnx --configuration Release --no-restore # ← .slnx not .sln
+    # ── 4. Build ──────────────────────────────────────────────────
+    - name: Build solution
+      run: dotnet build SmartBank.slnx --no-restore --configuration Release
 
-      - name: Run unit tests
-        run: >
-          dotnet test SmartBank.Tests/SmartBank.Tests.csproj
-          --configuration Release
-          --no-build
-          --verbosity normal
-          --logger "trx;LogFileName=test-results.trx"
+    # ── 5. Run Tests ──────────────────────────────────────────────
+    - name: Run tests
+      run: dotnet test ${{ env.TEST_PROJECT }} --no-build --configuration Release --verbosity normal
 
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: "**/*.trx"
+    # ── 6. Publish API ────────────────────────────────────────────
+    - name: Publish API
+      run: dotnet publish ${{ env.API_PROJECT }} --configuration Release --output ./publish/api
 
-  # ─────────────────────────────────────────────────────────────
-  # JOB 2 — Deploy (only on push to main, after tests pass)
-  # ─────────────────────────────────────────────────────────────
-  deploy:
-    name: Deploy to Azure
-    runs-on: ubuntu-latest
-    needs: build-and-test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    # ── 7. Publish MVC ────────────────────────────────────────────
+    - name: Publish MVC
+      run: dotnet publish ${{ env.MVC_PROJECT }} --configuration Release --output ./publish/mvc
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    # ── 8. Deploy API to Azure App Service ───────────────────────
+    - name: Deploy API to Azure
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: 'smartbank-api'           # must match your App Service name
+        publish-profile: ${{ secrets.AZURE_API_PUBLISH_PROFILE }}
+        package: ./publish/api
 
-      - name: Setup .NET 9
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "9.0.x"
-
-      - name: Restore dependencies
-        run: dotnet restore SmartBank.slnx # ← .slnx, consistent with build job
-
-      # ── Publish API ────────────────────────────────────────────
-      - name: Publish API
-        run: >
-          dotnet publish SmartBank.API/SmartBank.API.csproj
-          --configuration Release
-          --output ./publish/api
-          --no-restore
-
-      # ── Publish MVC ────────────────────────────────────────────
-      - name: Publish MVC
-        run: >
-          dotnet publish SmartBank.MVC/SmartBank.MVC.csproj
-          --configuration Release
-          --output ./publish/mvc
-          --no-restore
-
-      # ── Deploy API ─────────────────────────────────────────────
-      - name: Deploy API to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ secrets.AZURE_API_APP_NAME }}
-          publish-profile: ${{ secrets.AZURE_API_PUBLISH_PROFILE }}
-          package: ./publish/api
-
-      # ── Deploy MVC ─────────────────────────────────────────────
-      - name: Deploy MVC to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ secrets.AZURE_MVC_APP_NAME }}
-          publish-profile: ${{ secrets.AZURE_MVC_PUBLISH_PROFILE }}
-          package: ./publish/mvc
+    # ── 9. Deploy MVC to Azure App Service ───────────────────────
+    - name: Deploy MVC to Azure
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: 'smartbank-mvc'           # must match your App Service name
+        publish-profile: ${{ secrets.AZURE_MVC_PUBLISH_PROFILE }}
+        package: ./publish/mvc

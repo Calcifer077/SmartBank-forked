@@ -1,28 +1,31 @@
+using System.Text;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using SmartBank.API.DTOs.Auth;
 using SmartBank.API.DTOs.Accounts;
-using SmartBank.API.DTOs.Transactions;
+using SmartBank.API.DTOs.Auth;
 using SmartBank.API.DTOs.Loans;
 using SmartBank.API.DTOs.Support;
-using SmartBank.API.Validators;
+using SmartBank.API.DTOs.Transactions;
 using SmartBank.API.Middleware;
 using SmartBank.API.Services;
+using SmartBank.API.Validators;
 using SmartBank.Data;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<SmartBankDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
-var jwtKey = builder.Configuration["JwtSettings:SecretKey"]
+var jwtKey =
+    builder.Configuration["JwtSettings:SecretKey"]
     ?? throw new InvalidOperationException("JWT SecretKey missing.");
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder
+    .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -33,7 +36,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
             ValidAudience = builder.Configuration["JwtSettings:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
         };
     });
 
@@ -65,29 +68,34 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "SmartBank API", Version = "v1" });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Enter: Bearer {your token}"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+    c.AddSecurityDefinition(
+        "Bearer",
+        new OpenApiSecurityScheme
         {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
+            Name = "Authorization",
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "Bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Enter: Bearer {your token}",
         }
-    });
+    );
+    c.AddSecurityRequirement(
+        new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer",
+                    },
+                },
+                Array.Empty<string>()
+            },
+        }
+    );
 });
 
 builder.Services.AddDistributedMemoryCache();
@@ -99,25 +107,26 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("SmartBankPolicy", policy =>
-    {
-        policy
-            .WithOrigins(
-                "https://smartbank-mvc-prod-fhckddgcghbnfncf.centralindia-01.azurewebsites.net/",
-                "http://localhost:5112"
-            )
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
+    options.AddPolicy(
+        "SmartBankPolicy",
+        policy =>
+        {
+            policy
+                .WithOrigins(
+                    "https://smartbank-mvc-asdbh3g2ajdge4ca.koreacentral-01.azurewebsites.net",
+                    "http://localhost:5112"
+                )
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+    );
 });
 
 var app = builder.Build();
 
-
-app.UseMiddleware<ExceptionMiddleware>(); 
+app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
@@ -125,13 +134,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Auto-apply migrations on startup (good for student/dev deployments)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<SmartBankDbContext>();
+    db.Database.Migrate(); // applies pending migrations automatically
+}
+
 app.UseSession();
 app.UseHttpsRedirection();
 app.UseCors("SmartBankPolicy");
-app.UseAuthentication(); 
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-
