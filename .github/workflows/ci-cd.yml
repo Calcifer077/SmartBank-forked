@@ -24,7 +24,7 @@ jobs:
           dotnet-version: "9.0.x"
 
       - name: Restore dependencies
-        run: dotnet restore SmartBank.sln
+        run: dotnet restore
 
       - name: Build — Release
         run: dotnet build SmartBank.sln --configuration Release --no-restore
