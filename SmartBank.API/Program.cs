@@ -138,10 +138,19 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 }
 
 // Auto-apply migrations on startup (good for student/dev deployments)
+// Safely apply migrations — don't crash the app if it fails
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<SmartBankDbContext>();
-    db.Database.Migrate(); // applies pending migrations automatically
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<SmartBankDbContext>();
+        db.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Migration failed — app will still start.");
+    }
 }
 
 app.UseSession();
