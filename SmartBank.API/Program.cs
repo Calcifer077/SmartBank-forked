@@ -107,6 +107,8 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// this is a test commit
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
