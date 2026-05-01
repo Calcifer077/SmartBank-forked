@@ -106,7 +106,7 @@ builder.Services.AddCors(options =>
     {
         policy
             .WithOrigins(
-                "https://smartbank-mvc-prod-fhckddgcghbnfncf.centralindia-01.azurewebsites.net",
+                "https://smartbank-mvc-prod-fhckddgcghbnfncf.centralindia-01.azurewebsites.net/",
                 "http://localhost:5112"
             )
             .AllowAnyHeader()
