@@ -99,6 +99,21 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("SmartBankPolicy", policy =>
+    {
+        policy
+            .WithOrigins(
+                "https://smartbank-mvc-prod-fhckddgcghbnfncf.centralindia-01.azurewebsites.net",
+                "http://localhost:5112"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 
@@ -111,8 +126,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseSession();
+app.UseHttpsRedirection();
+app.UseCors("SmartBankPolicy");
 app.UseAuthentication(); 
 app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+

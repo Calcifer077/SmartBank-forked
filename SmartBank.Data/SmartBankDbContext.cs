@@ -144,20 +144,7 @@ namespace SmartBank.Data
                 new Role { RoleId = 5, RoleName = "Auditor" }
             );
 
-            modelBuilder.Entity<User>().HasData(new User
-{
-    UserId = 1,
-    FullName = "System Admin",
-    Email = "admin@smartbank.com",
-    // BCrypt hash of "Admin@1234"
-    PasswordHash = "$2a$11$zzCbmvvSrGMaO8DFY4G2bOvDjBE1vHNuQIaE5VkmUFDGLAOmQtXrO",
-    PhoneNumber = "9999999999",
-    Address = "SmartBank HQ",
-    RoleId = 1,
-    KycStatus = "Verified",
-    IsActive = true,
-    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-});
+        
         }
     }
 }
