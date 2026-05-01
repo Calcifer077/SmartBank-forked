@@ -32,6 +32,7 @@ namespace SmartBank.MVC.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
+            Console.WriteLine(_api);
             var result = await _api.PostAsync<ApiResponseWrapper<AuthDataDto>>(
                 "api/auth/register", new
                 {
@@ -77,6 +78,8 @@ namespace SmartBank.MVC.Controllers
         {
             if (!ModelState.IsValid)
                 return View(model);
+
+            Console.WriteLine("commiting to api");
 
             var result = await _api.PostAsync<ApiResponseWrapper<AuthDataDto>>(
                 "api/auth/login", new
