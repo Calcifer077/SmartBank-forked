@@ -150,4 +150,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+app.MapGet(
+    "/debug-config",
+    (IConfiguration config) => config.GetConnectionString("DefaultConnection") ?? "NULL / NOT FOUND"
+);
+
 app.Run();
