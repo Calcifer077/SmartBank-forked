@@ -24,10 +24,10 @@ jobs:
           dotnet-version: "9.0.x"
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore SmartBank.slnx # ← explicit target, avoids picking up nested .sln files
 
       - name: Build — Release
-        run: dotnet build SmartBank.sln --configuration Release --no-restore
+        run: dotnet build SmartBank.slnx --configuration Release --no-restore # ← .slnx not .sln
 
       - name: Run unit tests
         run: >
@@ -63,7 +63,7 @@ jobs:
           dotnet-version: "9.0.x"
 
       - name: Restore dependencies
-        run: dotnet restore SmartBank.sln
+        run: dotnet restore SmartBank.slnx # ← .slnx, consistent with build job
 
       # ── Publish API ────────────────────────────────────────────
       - name: Publish API
