@@ -128,6 +128,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseCors("SmartBankPolicy");
 app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
@@ -145,7 +146,6 @@ using (var scope = app.Services.CreateScope())
 
 app.UseSession();
 app.UseHttpsRedirection();
-app.UseCors("SmartBankPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
